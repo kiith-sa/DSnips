@@ -75,7 +75,7 @@ Reference_.
 
 .. _wrap:
 
-Wrapping code
+Code wrapping
 ^^^^^^^^^^^^^
 
 Some snippets (if_, try_, etc.) can be used to wrap code using the visual placeholder
@@ -201,7 +201,7 @@ case_, elif_, else_, fsw_, if_, ife_, sw_
 
 *if*
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/if1.gif
 
@@ -217,7 +217,7 @@ Can wrap_ code.
 
 *else if*
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/elif.gif
 
@@ -227,7 +227,7 @@ Can wrap_ code.
 
 *else*
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/else.gif
 
@@ -278,7 +278,7 @@ do_, for_, fore_, forever_, forif_, wh_
 
 *do while* loop
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/do.gif
 
@@ -288,7 +288,7 @@ Can wrap_ code.
 
 *while* loop
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/wh.gif
 
@@ -299,7 +299,7 @@ Can wrap_ code.
 
 *for* loop
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/for.gif
 
@@ -311,7 +311,7 @@ Can wrap_ code.
 
 *foreach* loop
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/fore1.gif
 
@@ -329,7 +329,7 @@ Can wrap_ code.
 
 infinite *for* loop
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/forever.gif
 
@@ -343,7 +343,7 @@ Usually, a better way to do this is to use *std.algorithm.filter* but it is (at 
 with current Phobos/DMD) sometimes easier/more readable to write performant code with
 a foreach/if combination.
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/forif.gif
 
@@ -547,7 +547,7 @@ catch_, thr_, try_, tryf_
 
 *try*/*catch* block, *catch* block, *throw* statement
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/try_catch_throw.gif
 
@@ -561,7 +561,7 @@ Can wrap_ code.
 
 *try*/*catch*/*finally* block
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/tryf.gif
 
@@ -667,7 +667,7 @@ values into the mixin at compile-time.
 
 *debug* block
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/debug.gif
 
@@ -677,7 +677,7 @@ Can wrap_ code.
 
 *version* block
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/version.gif
 
@@ -933,7 +933,7 @@ DDoc *Example*
 
 Must be preceded with ``'/// '`` or ``'* '`` (i.e. single- or multi-line DDoc comments).
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/docEx.gif
 
@@ -1098,7 +1098,7 @@ parent constructor call
 
 *scope* guard
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/scope.gif
 
@@ -1108,7 +1108,7 @@ Can wrap_ code.
 
 *with* block
 
-Can wrap_ code.
+Supports code-wrapping_.
 
 .. figure:: ./gif/with.gif
 
