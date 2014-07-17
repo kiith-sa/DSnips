@@ -21,11 +21,13 @@ A few examples of what snippets can do:
 .. figure:: ./gif/fore2.gif
 
    fore_
+
 ----
 
 .. figure:: ./gif/try_catch_throw.gif
 
    try_ + thr_ + catch_ + if_
+
 ----
 
 .. figure:: ./gif/class.gif
@@ -202,6 +204,7 @@ case_, elif_, else_, fsw_, if_, ife_, sw_
 Can wrap_ code.
 
 .. figure:: ./gif/if1.gif
+
 ----
 
 .. figure:: ./gif/if2.gif
@@ -313,6 +316,7 @@ Can wrap_ code.
 .. figure:: ./gif/fore1.gif
 
    Also in this sample: if_
+
 ----
 
 .. figure:: ./gif/fore2.gif
@@ -443,6 +447,7 @@ DDoc comments.
 
    Notice that we change the documentation comment style by typing */*** in the
    "Description" tabstop.  Also in this sample: fore_
+
 ----
 
 .. figure:: ./gif/fun2.gif
@@ -472,6 +477,7 @@ future.
 
    By default, the generated getter returns a field with the getter's' name suffixed by
    '_'.
+
 ----
 
 .. figure:: ./gif/get2.gif
@@ -899,6 +905,7 @@ a *Params* section with 4 items.
 .. figure:: ./gif/docPar_docRet1.gif
 
    Document 1 parameter with ``Par`` and the return value with ``Ret``.
+
 ----
 
 .. figure:: ./gif/docPar2.gif
@@ -995,6 +1002,7 @@ common license for D projects).
 .. figure:: ./gif/module1.gif
 
    Using the default (Boost) license
+
 ----
 
 .. figure:: ./gif/module2.gif
@@ -1069,6 +1077,7 @@ functions.
 .. figure:: ./gif/spn1.gif
 
    Also in this sample: ret_
+
 ----
 
 .. figure:: ./gif/spn2.gif
