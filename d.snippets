@@ -1,0 +1,967 @@
+# clear old D snippets. 
+# (TODO should be removed if we request a merge into the default repo)
+clearsnippets
+priority -50
+
+global !p 
+
+# Functions useful for all snippets
+
+def complete(t, opts):
+    """
+    Modified completion example from UltiSnips videos.
+    """
+    if t:
+        opts = [m[len(t):] for m in opts if m.startswith(t) ]
+    if len(opts) == 0:
+        return ""
+    if len(opts) == 1:
+        return opts[0]
+    return "(" + '|'.join(opts) + ')'
+
+def breakLine(snip, linelength, extraindent = 0, default = ""):
+    """
+    Insert a line break if a line is too long.
+
+    :param snip:        The UltiSnips snippet object.
+    :param linelength:  Length of the line.
+    :param extraindent: Add this many spaces of extra indentation after the line break 
+                        (for alignment of lines).
+    :param default:     If the line is not too long, insert this string instead of a
+                        line break.
+    """
+    textwidth = int(snip.opt("&textwidth", "80"))
+    # don't break at all if textwidth is 0
+    if textwidth > 0 and linelength > textwidth:
+        snip.rv += snip.mkline("\n")
+        snip.rv += snip.mkline(" " * extraindent)
+    else:
+        snip.rv += default
+
+def alignSpaces(t, current, *other):
+    """
+    Get a string of spaces long enough to align the current tabstop with tabstops
+    above/below it that should be aligned equally.
+    Useful e.g. to align parameter names in DDoc of a function.
+
+    :param t: Tabstops of the snippet 
+    :param current: Index of the current item that's being aligned in t
+    :param other: Indices of all other items aligned with the current element
+    """
+    thisWidth = len(t[current])
+    maxWidth  = max(thisWidth, max([len(t[s]) for s in other]))
+    return (maxWidth - thisWidth) * " ";
+
+def paramNames(paramStr):
+    """
+    Get a list of parameter names for a function.
+
+    :param paramStr: Parameter list of a function as a single string. E.g. for 
+                     void doStuff(int p1, string p2), this would be "int p1, string p2"
+    """
+    import re
+    # Remove every paren pair and what is between the parens
+    # (e.g. templated types, delegs, etc)
+    paramStr = re.sub(r'\([^)]*\)', '', paramStr)
+    # Split into individual params and get the last word (param name) for each param
+    return [a.strip().split()[-1] for a in paramStr.split(',') if a.strip() != ""]
+
+def docStyle(docStr):
+    """
+    Get the documentation style ('///' vs '/**/') based on a reference documentation
+    string. Returns a 3-tuple of strings: comment string for the first line of
+    a documentation block, comment string for a line in the middle of a documentation
+    block and a comment string for the line at the end of the documentation block,
+    *after* the last documentation line with content.
+
+    :param docStr: A reference documentation line (e.g. written by the user)
+    """
+    docStr = docStr.strip()
+    if docStr.startswith("*") or docStr.startswith("/*"):
+        return ("/**", " *", " */")
+    return ("///", "///", "")
+
+def paramsDoc(snip, paramStr, docStr):
+    """
+    Generate the 'Params:' DDoc section with all parameter names.
+
+    :param snip:     The UltiSnips snippet object.
+    :param paramStr: Parameter list of a function as a single string. E.g. for 
+                     void doStuff(int p1, string p2), this would be "int p1, string p2"
+    :param docStr:   A reference documentation string to determine documentation style
+                     ('///' vs '/**/')
+    """
+    params = paramNames(paramStr)
+    prefix = docStyle(docStr)[1]
+    if params == []:
+        return
+    maxWidth = max([len(p) for p in params])
+    snip += prefix + " Params:"
+    snip += prefix
+    for param in params:
+        snip += prefix + " " + param + (maxWidth - len(param)) * " " + " ="
+
+def funcDoc(snip, description, params, defParams):
+    """
+    Generate a DDoc header for a function (except the description at the beginning of 
+    the header, which is written by the user as a tabstop)
+
+    :param snip:        The UltiSnips snippet object.
+    :param params:      Parameter list of the function as a single string. E.g. for 
+                        void doStuff(int p1, string p2), this would be "int p1, string p2".
+    :param defParams:   Default parameter list of the function as defined by the
+                        snippet (as a single string),
+    :param description: Description DDoc comment of the function written by the user.
+                        (Usually the top line of a DDoc block)
+    """
+    style = docStyle(description)
+    if params not in ["", defParams]:
+        snip += style[1]
+        paramsDoc(snip, params, description)
+    if style[2] != "":
+        snip += style[2]
+
+def typeName(basename):
+    """
+    Get a name for a type (e.g. class or struct) defined by a snippet based on the 
+    base name of the file.
+
+    :param basename: The base name of the source file. E.g. 'matrix' for 'matrix.d'.
+    """
+    if basename:
+        return basename[0].upper() + basename[1:]
+    else:
+        # If there's no basename for some reason, make it evident that the user needs
+        # to specify the name
+        return "/+name+/"
+
+# Code for the "for" snippet
+def forVar(definition):
+    """
+    Get the variable name from a string such as 'int a = 1'
+
+    :param definition: Declaration of the 'for counter variable'
+    """
+    if '=' in definition:
+        return definition.split("=")[0].split()[-1]
+    if len(definition) > 0:
+        return definition.split()[-1]
+    return ""
+
+# Code for the "op" snippet
+
+def opType(match):
+    """
+    Determine the type of operator for the 'op' snippet.
+
+    :param match: Regex matches of the snippet.
+    """
+    t = match.group(1)[0];
+    if not t in ['U', 'B', 'O']:
+        return "ERROR: Unknown operator type"
+    return {'U':"Unary", 'B':"Binary", 'O':"OpAssign"}[t]
+
+def opList(t, match):
+    """
+    Get a list of operators to overload as strings for the 'op' snippets.
+
+    :param t: Tabstops of the snippet
+    """
+    if len(t[1]) == 0:
+        return ["specify an operator"]
+    #opstring = t[1][1:]
+    opstring = t[1]
+    optype  = opType(match)
+    if optype not in ["Unary", "Binary", "OpAssign"]:
+        return ["ERROR: Unhandled operator type"]
+    validOps = {"Unary":    ["--", "++", "-", "+", "~", "*"],
+                "Binary":   [">>>","<<",">>","^^","in","~","+","-","*","/","%","&","|","^"],
+                "OpAssign": [">>>=","<<=",">>=","^^=","+=","-=","*=","/=","%=","&=","|=","^=","~="]
+               }[optype]
+    result = []
+    while opstring != "":
+        # if opstring starts with a valid operator, move the operator to result
+        for op in validOps:
+            if opstring.startswith(op):
+                if op in result:
+                    return ["duplicate operator: " + op]
+                result.append(op)
+                opstring = opstring[len(op):]
+                break
+        # we didn't break out of the for loop;
+        # i.e. opstring doesn't start by a valid operator
+        else:
+            # we're at the end of the original opstring and the user is typing a new
+            # operator but not done yet, so just return the operators done so far
+            if opstring in [a[:len(opstring)] for a in validOps]:
+                return result if result != [] else ["specify an operator"]
+            if opstring != "":
+                return ["no op" + optype + " operator starts with " + opstring]
+    return result
+
+endglobal
+
+# Future TODO: more snippets taking line width to account.
+#              E.g. if switch cases are short enough, make them one-line,
+#              splitting writefln and similar.
+
+# -------
+# Various
+# -------
+
+snippet module "New module (module)" b
+${1://          Copyright ${2:/+1: Author+/} `!v strftime("%Y")`.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)}
+
+module ${3:/+2: package name+/}.`!v Filename('$1', 'name')`;
+
+
+${0}
+endsnippet
+
+snippet imp "import (imp)"
+import ${1:std}.${2:stdio};
+${0}
+endsnippet
+
+snippet al "alias (al)" b
+alias ${1:/+1: alias+/} = ${2:/+2: original name+/};
+${0}
+endsnippet
+
+snippet new "new (new)"
+new ${1}(${0})
+endsnippet
+
+# Future TODO: @safe should have completion for @system and @trusted.
+#              const should have completion for immutable and inout.
+
+# @nogc is $0 so when used in a function definition snippet we can move to the next 
+# tabstop immediately
+snippet spn "@safe pure nothrow const @nogc (spn)"
+${1:@safe }${2:pure }${3:nothrow }${4:const }${0:@nogc }
+endsnippet
+
+snippet cont "continue (cont)" b
+continue;
+endsnippet
+
+snippet pub "public (pub)" b
+public:
+	${0}
+endsnippet
+
+snippet priv "private (priv)" b
+private:
+	${0}
+endsnippet
+
+snippet prot "protected (prot)" b
+protected:
+	${0}
+endsnippet
+
+snippet pack "package (pack)" b
+package:
+	${0}
+endsnippet
+
+snippet ret "return (ret)"
+return ${0};
+endsnippet
+
+snippet avar "auto variable (avar)" b
+auto ${1:/+2: variable+/} = ${2:/+3: value+/};
+${0}
+endsnippet
+
+snippet cvar "const variable (cvar)" b
+const ${1:/+2: variable+/} = ${2:/+3: value+/};
+${0}
+endsnippet
+
+snippet ivar "immutable variable (ivar)" b
+immutable ${1:/+2: variable+/} = ${2:/+3: value+/};
+${0}
+endsnippet
+
+snippet supe "super (supe)" b
+super(${1});
+endsnippet
+
+# Future TODO: exit/success/failure completion
+snippet scope "scope (scope)" b
+scope(${1:exit})
+{
+	${2:${VISUAL}}${0}
+}
+endsnippet
+
+snippet with "with (with)"
+with(${1})
+{
+	${2:${VISUAL}}${0}
+}
+endsnippet
+
+
+# ------
+# Phobos
+# ------
+
+snippet tup "tuple (tup)"
+tuple(${1:/*first*/}, ${0:/*more*/})
+endsnippet
+
+snippet wr "writeln (wr)"
+writeln(${1});
+${0}
+endsnippet
+
+snippet wrf "writefln (wrf)"
+writefln("${1:/+1: format string+/}", ${2:/+2: values+/});
+${0}
+endsnippet
+
+snippet enf "enforce (enf)" b
+enforce(${1:/+1: condition+/},`!p
+linelength = len(snip.indent + "enforce(, new Exception());" + t[1] + t[2] + t[3])
+breakLine(snip, linelength, len("enforce("), " ")
+`new ${2}Exception(${3}));
+${0}
+endsnippet
+
+snippet format "format (format)"
+"${1:/+1: format string+/}".format(${0:/+2: values+/})
+endsnippet
+
+
+# --------
+# Branches
+# --------
+
+snippet if "if .. (if)"
+if(${1:/+1: condition+/})
+{
+	${2:${VISUAL}}${0}
+}
+endsnippet
+
+snippet ife "if .. else (ife)"
+if(${1:/+1: condition+/})
+{
+	${2:/+2: code+/}
+}
+else
+{
+	${3:/+3: else+/}
+}
+endsnippet
+
+snippet else "else (else)" b
+else
+{
+	${1:${VISUAL}}${0}
+}
+endsnippet
+
+snippet elif "else if (elif)" b
+else if(${1:/+1: condition+/})
+{
+	${2:${VISUAL}}${0}
+}
+endsnippet
+
+snippet sw "switch (sw)"
+switch(${1:/+1: var+/})
+{
+	case ${2:/+2: value+/}:
+		${3:/+3: code+/}
+		break;
+	case ${4:/+4: value+/}:
+		${5:/+5: code+/}
+		break;
+	${0:/+more cases+/}
+	default:
+		${6:assert(false);}
+}
+endsnippet
+
+snippet fsw "final switch (fsw)"
+final switch(${1:/+1: var+/})
+{
+	case ${2:/+2: value+/}:
+		${3:/+3: code+/}
+		break;
+	case ${4:/+4: value+/}:
+		${5:/+5: code+/}
+		break;
+	${0:/+more cases+/}
+}
+endsnippet
+
+snippet case "case (case)" b
+case ${1:/+1: value+/}:
+	${2}
+	break;
+${0}
+endsnippet
+
+# -----
+# Loops
+# -----
+
+snippet do "do while (do)" b
+do
+{
+	${2:${VISUAL}}${0}
+} while(${1:/+1: condition+/});
+endsnippet
+
+snippet wh "while (wh)" b
+while(${1:/+1: condition+/})
+{
+	${2:${VISUAL}}${0}
+}
+endsnippet
+
+snippet for "for (for)" b
+for(${2:int i = 0}; `!p snip.rv = forVar(t[2])` ${1:< count}; ${3:++`!p snip.rv = forVar(t[2])`})
+{
+	${4:${VISUAL}}${0}
+}
+endsnippet
+
+snippet forever "forever (forever)" b
+for(;;)
+{
+	${1:${VISUAL}}${0}
+}
+endsnippet
+
+snippet fore "foreach (fore)"
+foreach(${1:item}; ${2:/+2: range+/})
+{
+	${3:${VISUAL}}${0}
+}
+endsnippet
+
+snippet forif "foreach if (forif)" b
+foreach(${1:item}; ${2:/+2: range+/}) if(${3:/+3: condition+/})
+{
+	${4:${VISUAL}}${0}
+}
+endsnippet
+
+# -------------------------
+# Contracts, asserts, tests
+# -------------------------
+
+snippet in "in contract (in)" b
+in
+{
+	${0}
+}
+body
+endsnippet
+
+snippet out "out contract (out)" b
+out${1:(result)}
+{
+	${0}
+}
+body
+endsnippet
+
+snippet invar "invariant (invar)" b
+invariant()
+{
+	${0}
+}
+endsnippet
+
+snippet as "assert (as)"
+assert(${1:false},`!p
+linelength = len(snip.indent + "assert(, \"\");" + t[1] + t[2])
+breakLine(snip, linelength, len("assert("), " ")
+`"${2:TODO}");
+${0}
+endsnippet
+
+snippet utest "unittest (utest)" b
+unittest
+{
+	${0}
+}
+endsnippet
+
+snippet doctest "documented unittest (doctest)" b
+///
+unittest
+{
+	${0}
+}
+endsnippet
+
+# ---------
+# Functions
+# ---------
+
+# future TODO: if non-void, generate `Returns:`. If `throw` found in body, generate
+#              `Throws:`
+snippet fun "function definition (fun)"
+${5:/+5: /// Description+/}`!p 
+funcDoc(snip, t[5], t[3], "")
+`
+${1:void} ${2:/+2: name+/}(${3}) ${4:@safe pure nothrow @nogc}
+{
+	${0}
+}
+endsnippet
+
+snippet this "constructor (this)" w
+${3:/+3: /// Description+/}`!p 
+funcDoc(snip, t[3], t[1], "")
+`
+this(${1})${2: @safe pure nothrow @nogc}
+{
+	${0}
+}
+endsnippet
+
+snippet get "getter property (get)" !
+${1:/+1: type+/} ${2:/+2: name+/}() ${3:@safe pure nothrow const @nogc}
+{
+	return ${0:$2_};
+}
+endsnippet
+
+snippet set "setter property (set)" !
+void ${1:/+1: name+/}(${2:/+2: type+/} rhs) ${3:@safe pure nothrow @nogc}
+{
+	${0:$1_} = rhs;
+}
+endsnippet
+
+snippet main "Main" b
+void main(string[] args)
+{
+	${1:${VISUAL}}${0}
+}
+endsnippet
+
+snippet toStr "toString (toStr)"
+string toString()${1: @safe const pure nothrow}
+{
+	${0}
+}
+endsnippet
+
+snippet '(Input)?Range' "InputRange primitives (range , inputRange)" rb
+${1:/+1: range element type+/} front()${2: @safe pure nothrow const}
+{
+	assert(!empty, "Can't get front of an empty range");
+	${3:return ${4:/+4: return the element+/};}
+}
+
+void popFront()${5: @safe pure nothrow}
+{
+	assert(!empty, "Can't pop front of an empty range");
+	${6:/+6: remove the front element of the range+/}
+}
+
+bool empty()${7: @safe pure nothrow const @nogc}
+{
+	${8:return ${9:/+9: true if empty, false otherwise+/};}
+}
+endsnippet
+
+# ------------------
+# Exception handling
+# ------------------
+
+snippet try "try/catch (try)" b
+try
+{
+	${1:${VISUAL}}${2}
+}
+catch(${3:/+3: name+/}Exception e)
+{
+	${4:/+4: handle exception+/}
+}
+${0}
+endsnippet
+
+snippet tryf "try/catch/finally (tryf)" b
+try
+{
+	${1:${VISUAL}}${2}
+}
+catch(${3:/+3: name+/}Exception e)
+{
+	${4:/+4: handle exception+/}
+}
+finally
+{
+	${5:/+5: cleanup+/}
+}
+endsnippet
+
+snippet catch "catch (catch)" b
+catch(${1:/+1: name+/}Exception e)
+{
+	${0:/+2: handle the exception+/}
+}
+endsnippet
+
+snippet thr "throw (thr)" b
+throw new ${1:/+1: name+/}Exception(${0});
+endsnippet
+
+
+# ----------------
+# Type definitions
+# ----------------
+
+snippet struct "struct (struct)"
+struct ${1:`!p snip.rv = typeName(snip.basename)`}
+{
+	${0}
+}
+endsnippet
+
+snippet union "union (union)"
+union ${1:`!p snip.rv = typeName(snip.basename)`}
+{
+	${0}
+}
+endsnippet
+
+snippet class "class (class)" b
+class ${1:`!p snip.rv = typeName(snip.basename)`}
+{
+	${0}
+}
+endsnippet
+
+snippet inter "interface (inter)" b
+interface ${1:`!p snip.rv = typeName(snip.basename)`}
+{
+	${0}
+}
+endsnippet
+
+snippet enum "enum (enum)" b
+enum ${1:`!p snip.rv = typeName(snip.basename)`}
+{
+	${0}
+}
+endsnippet
+
+snippet exc "exception definition (exc)" b
+${3:/+3: documentation+/}
+class ${1:/+1: name+/}Exception : ${2:/+1: parent+/}Exception 
+{
+	this(string msg, string file = __FILE__, int line = __LINE__)
+		@safe pure nothrow
+	{
+		super(msg, file, line);
+	}
+}
+endsnippet
+
+
+# ----------------------------------------------
+# Metaprogramming, conditional compilation, etc.
+# ----------------------------------------------
+
+snippet mix "mixin (mix)" b
+mixin ${1};
+${0}
+endsnippet
+
+snippet smix "string mixin (smix)" b
+mixin(q{
+${1:/+1: mixin format string+/}
+}.format(${2:/+2: vars to mix in+/}));
+${0}
+endsnippet
+
+snippet version "version (version)" b
+version(${1:/+1: version name+/})
+{
+	${2:${VISUAL}}${0}
+}
+endsnippet
+
+snippet debug "debug" b
+debug
+{
+	${1:${VISUAL}}${0}
+}
+endsnippet
+
+snippet template "template (template)" b
+${4:/+4: /// Description+/}`!p 
+funcDoc(snip, t[4], t[3], "/+3: parameters+/")
+`
+${1:mixin }template ${2:/+2: name+/}(${3:/+3: parameters+/})
+{
+	${0}
+}
+endsnippet
+
+
+# ---------
+# Operators
+# ---------
+
+snippet opDis "opDispatch (opDis)"
+${3:/+3: /// Description+/}`!p 
+funcDoc(snip, t[3], t[2], "/+2: parameters+/")
+`
+${1:auto} opDispatch(string s)(${2})
+{
+	${0}
+}
+endsnippet
+
+snippet `op(=|Assign)` "opAssign (op=)" r
+void opAssign(${1:/+1: type+/} rhs)${2: @safe pure nothrow @nogc }
+{
+	${0}
+}
+endsnippet
+
+snippet `op(\$|Dollar)` "opDollar (op$)" r
+size_t opDollar()${1: @safe pure nothrow const @nogc }
+{
+	${0}
+}
+endsnippet
+
+# opSlice operator. Displays an error if there are not 0 or 2 parameters.
+snippet `op(\[\.\.\]|Slice)` "opSlice (op[..])" r
+${1:/+1: return type+/} opSlice(${2:size_t start, size_t end})${3: @safe pure nothrow }
+{
+	${0} `!p snip.rv = "" if len(paramNames(t[2])) in [0,2] else "// opSlice() must have 0 or 2 parameters"`
+}
+endsnippet
+
+# opIndex operator. Displays an error if there are 0 parameters.
+snippet `op(\[\]|Index)` "opIndex (op[])" r
+${1:/+1: return type+/} opIndex(${2:size_t index})${3: @safe pure nothrow const @nogc }
+{
+	${0} `!p snip.rv = "" if len(paramNames(t[2])) > 0 else "// opIndex() must have at least 1 parameter"`
+}
+endsnippet
+
+# opSliceAssign operator. Displays an error if there are not 1 or 3 parameters.
+snippet `op(\[\.\.\]=|SliceAssign)` "opSliceAssign (op[..]=)" r
+${1:void} opSliceAssign(${2:/+type+/} rhs${3:, size_t start, size_t end})${4: @safe pure nothrow const}
+{
+	${0} `!p snip.rv = "" if len(paramNames(t[3])) in [0,2] else "// opSliceAssign() must have 1 or 3 parameters"`
+}
+endsnippet
+
+# opIndexAssign operator. Displays an error if there less than 2 parameters.
+snippet `op(\[\]=|IndexAssign)` "opIndexAssign (op[]=)" r
+${1:void} opIndexAssign(${2:/+type+/} rhs, ${3:size_t index})${4: @safe pure nothrow @nogc }
+{
+	${0} `!p snip.rv = "" if len(paramNames(t[3])) > 0 else "// opIndexAssign() must have at least 1 index parameter"`
+}
+endsnippet
+
+snippet `op(\(\)|Call)` "opCall (op())" r
+${4:/+4: /// Description+/}`!p 
+funcDoc(snip, t[4], t[2], "/+2: parameters+/")
+`
+${1:/+1: return type+/} opCall(${2:/+2: parameters+/})${3: @safe pure nothrow }
+{
+	${0}
+}
+endsnippet
+
+# Generates any opBinary, opUnary or opOpAssign operator supported by D.
+snippet `op(B|U|O)` "opBinary/opUnary/opOpAssign generator (opB/opU/opO)" r
+`!p
+if t[3] == "/+2: type+/":
+    snip.rv = "// Write operators you want to overload (E.g. +-*/ or +=-= ).\n"
+else:
+    snip.rv = ""
+# Hack to ensure correct indentation
+snip.rv += snip.mkline("//")
+` ${1:/+1:operator string (e.g. "+-*/")+/} `!p
+snip.rv = "" if t[3] == "/+2: type+/" else "(XXX remove this line)"
+`
+${2:void} op`!p snip.rv = opType(match)`(string op)(${3:/+2: type+/} rhs)${4: @safe pure nothrow}
+{
+	static if(op == "`!p snip.rv = opList(t, match)[0]`")
+	{
+		${0}
+	}`!p
+# generate static if blocks for all operators except the first 
+# (the first is generated above)
+snip.shift(1)
+ops = opList(t, match)[1:]
+for op in ops:
+    snip += "else static if(op == \"" + op + "\")"
+    snip += "{"
+    snip += "    "
+    snip += "}"
+# make sure we delete the text from before if the user deletes an operator from the
+# operator string
+if len(ops) == 0:
+    snip.rv = ""
+snip.reset_indent()
+`
+	else static assert(false, typeof(this).stringof ~ " does not have operator " ~ op);
+}
+endsnippet
+
+snippet opCmp "opCmp (opCmp)"
+int opCmp(${1:/+1: type+/} rhs)${2: @safe pure nothrow const}
+{
+	${0}
+}
+endsnippet
+
+snippet opApply "opApply (opApply)"
+int opApply(int delegate(${1:/+1: type/s+/}) dg)
+{
+	int result = 0;
+	${0:/+ wrap the following in a loop: +/}
+	result = dg(${2:/+2: arg/s+/});
+	if(result)
+	{
+		break;
+	}
+
+	return result;
+}
+endsnippet
+
+
+# -----------------
+# DDoc and comments
+# -----------------
+#
+# This is more complicated than it should be since we can't have snippets that generate
+# more tabstops based on the trigger. So we have e.g. separate snippets for 
+# 1,2,3,4 and 5 params.
+#
+# The Par snippets keep the params aligned for readability, and support both '///' and
+# '/**/' comments.
+
+snippet todo "TODO (todo)" !
+// TODO: ${0} `!v strftime("%F")`
+endsnippet
+
+# Common standard DDoc sections
+
+snippet '(///|\*) Par(1)?' "Params (Par)" rb
+`!p snip.rv = match.group(1)` Params:
+`!p snip.rv = match.group(1)`
+`!p snip.rv = match.group(1)` ${1:/+1:name+/} = ${2:/+2:description+/}
+`!p snip.rv = match.group(1)` ${0}
+endsnippet
+
+snippet '(///|\*) Par2' "2 Params (Par2)" rb
+`!p snip.rv = match.group(1)` Params:
+`!p snip.rv = match.group(1)`
+`!p snip.rv = match.group(1)` ${1:/+1:name+/}`!p snip.rv = alignSpaces(t, 1, 3)` = ${2:/+2:description+/}
+`!p snip.rv = match.group(1)` ${3:/+3:name+/}`!p snip.rv = alignSpaces(t, 3, 1)` = ${4:/+4:description+/}
+`!p snip.rv = match.group(1)` ${0}
+endsnippet
+
+snippet '(///|\*) Par3' "3 Params (Par3)" rb
+`!p snip.rv = match.group(1)` Params:
+`!p snip.rv = match.group(1)`
+`!p snip.rv = match.group(1)` ${1:/+1:name+/}`!p snip.rv = alignSpaces(t, 1, 3, 5)` = ${2:/+2:description+/}
+`!p snip.rv = match.group(1)` ${3:/+3:name+/}`!p snip.rv = alignSpaces(t, 3, 1, 5)` = ${4:/+4:description+/}
+`!p snip.rv = match.group(1)` ${5:/+5:name+/}`!p snip.rv = alignSpaces(t, 5, 1, 3)` = ${6:/+6:description+/}
+`!p snip.rv = match.group(1)` ${0}
+endsnippet
+
+snippet '(///|\*) Par4' "4 Params (Par4)" rb
+`!p snip.rv = match.group(1)` Params:
+`!p snip.rv = match.group(1)`
+`!p snip.rv = match.group(1)` ${1:/+1:name+/}`!p snip.rv = alignSpaces(t, 1, 3, 5, 7)` = ${2:/+2:description+/}
+`!p snip.rv = match.group(1)` ${3:/+3:name+/}`!p snip.rv = alignSpaces(t, 3, 1, 5, 7)` = ${4:/+4:description+/}
+`!p snip.rv = match.group(1)` ${5:/+5:name+/}`!p snip.rv = alignSpaces(t, 5, 1, 3, 7)` = ${6:/+6:description+/}
+`!p snip.rv = match.group(1)` ${7:/+7:name+/}`!p snip.rv = alignSpaces(t, 7, 1, 3, 5)` = ${8:/+8:description+/}
+`!p snip.rv = match.group(1)` ${0}
+endsnippet
+
+snippet '(///|\*) Par5' "5 Params (Par5)" rb
+`!p snip.rv = match.group(1)` Params:
+`!p snip.rv = match.group(1)`
+`!p snip.rv = match.group(1)` ${1:/+1:name+/}`!p snip.rv = alignSpaces(t, 1, 3, 5, 7, 9)` = ${2:/+2:description+/}
+`!p snip.rv = match.group(1)` ${3:/+3:name+/}`!p snip.rv = alignSpaces(t, 3, 1, 5, 7, 9)` = ${4:/+4:description+/}
+`!p snip.rv = match.group(1)` ${5:/+5:name+/}`!p snip.rv = alignSpaces(t, 5, 1, 3, 7, 9)` = ${6:/+6:description+/}
+`!p snip.rv = match.group(1)` ${7:/+7:name+/}`!p snip.rv = alignSpaces(t, 7, 1, 3, 5, 9)` = ${8:/+8:description+/}
+`!p snip.rv = match.group(1)` ${9:/+9:name+/}`!p snip.rv = alignSpaces(t, 9, 1, 3, 5, 7)` = ${10:/+10:description+/}
+`!p snip.rv = match.group(1)` ${0}
+endsnippet
+
+snippet `(///|\*) Ret` "Returns (Ret)" rb
+`!p snip.rv = match.group(1)` Returns: ${1:/+1: what is returned+/}
+`!p snip.rv = match.group(1)` ${0}
+endsnippet
+
+snippet `(///|\*) Thr(1)?` "Throws (Thr)" rb
+`!p snip.rv = match.group(1)` Throws:
+`!p snip.rv = match.group(1)`
+`!p snip.rv = match.group(1)` ${1}Exception ${2:/+2: when is it thrown+/}
+`!p snip.rv = match.group(1)` ${0}
+endsnippet
+
+snippet `(///|\*) Thr2` "Throws (Thr2)" rb
+`!p snip.rv = match.group(1)` Throws:
+`!p snip.rv = match.group(1)`
+`!p snip.rv = match.group(1)` ${1}Exception`!p snip.rv = alignSpaces(t, 1, 3)` ${2:/+2: when is it thrown+/}
+`!p snip.rv = match.group(1)` ${3}Exception`!p snip.rv = alignSpaces(t, 3, 1)` ${4:/+4: when is it thrown+/}
+`!p snip.rv = match.group(1)` ${0}
+endsnippet
+
+snippet `(///|\*) See` "See_Also (See)" rb
+`!p snip.rv = match.group(1)` See_Also: ${1:/+1: what we should also see+/}
+`!p snip.rv = match.group(1)` ${0}
+endsnippet
+
+snippet `(///|\*) Ex` "Example (Ex)" rb
+`!p snip.rv = match.group(1)` Example:
+`!p snip.rv = match.group(1)` --------------------
+`!p snip.rv = match.group(1)` ${1:${VISUAL}}${0}
+`!p snip.rv = match.group(1)` --------------------
+endsnippet
+
+
+# License blocks
+
+snippet gpl "GPL (gpl)" b
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+// 
+// Copyright (C) ${0:Author}, `!v strftime("%Y")`
+endsnippet
+
+snippet bsl "Boost (bsl)" b
+//          Copyright ${0:Author} `!v strftime("%Y")`.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+endsnippet
