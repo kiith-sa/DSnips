@@ -73,10 +73,9 @@ DDoc *Params:* / *Returns:*                          Par_ / Ret_
 Various other snippets may save time depending on which D features you use most, see
 Reference_.
 
-.. _wrap:
 
-Code wrapping
-^^^^^^^^^^^^^
+Wrapping
+^^^^^^^^
 
 Some snippets (if_, try_, etc.) can be used to wrap code using the visual placeholder
 feature of UltiSnips. To wrap code, select the code you want to wrap (using visual
@@ -176,11 +175,10 @@ Automatically breaks the snippet into 2 lines if line length exceeds Vim ``textw
 
    Also in this sample: avar_
 
-.. _wr:
-.. _wrf:
-
-``wr``, ``wrf``
-###############
+``wr``
+######
+``wrf``
+#######
 
 *std.stdio.writeln*, *std.stdio.writefln*
 
@@ -201,7 +199,7 @@ case_, elif_, else_, fsw_, if_, ife_, sw_
 
 *if*
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/if1.gif
 
@@ -217,7 +215,7 @@ Supports code-wrapping_.
 
 *else if*
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/elif.gif
 
@@ -227,7 +225,7 @@ Supports code-wrapping_.
 
 *else*
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/else.gif
 
@@ -243,11 +241,10 @@ Supports code-wrapping_.
    Also in this sample: ret_
 
 
-.. _case:
-.. _sw:
-
-``sw``, ``case``
-################
+``sw``
+######
+``case``
+########
 
 *switch* and *case*
 
@@ -278,7 +275,7 @@ do_, for_, fore_, forever_, forif_, wh_
 
 *do while* loop
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/do.gif
 
@@ -288,7 +285,7 @@ Supports code-wrapping_.
 
 *while* loop
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/wh.gif
 
@@ -299,7 +296,7 @@ Supports code-wrapping_.
 
 *for* loop
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/for.gif
 
@@ -311,7 +308,7 @@ Supports code-wrapping_.
 
 *foreach* loop
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/fore1.gif
 
@@ -329,7 +326,7 @@ Supports code-wrapping_.
 
 infinite *for* loop
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/forever.gif
 
@@ -343,7 +340,7 @@ Usually, a better way to do this is to use *std.algorithm.filter* but it is (at 
 with current Phobos/DMD) sometimes easier/more readable to write performant code with
 a foreach/if combination.
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/forif.gif
 
@@ -506,12 +503,10 @@ the *main()* function
    Also in this sample: wr_
 
 
-.. _Range:
+``Range``
+#########
 
-``Range`` / ``InputRange``
-##########################
-
-*InputRange* methods
+*InputRange* methods [alias trigger: ``InputRange``]
 
 Many D types have range-style interfaces, of which *InputRange* is the most common
 subset. ``Range`` generates *InputRange* API stubs which can be filled in with its
@@ -538,16 +533,15 @@ catch_, thr_, try_, tryf_
 
 ----
 
-.. _try:
-.. _catch:
-.. _thr:
-
-``try``, ``catch``, ``thr``
-###########################
-
+``try``
+#######
+``catch``
+#########
+``thr``
+#######
 *try*/*catch* block, *catch* block, *throw* statement
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/try_catch_throw.gif
 
@@ -561,7 +555,7 @@ Supports code-wrapping_.
 
 *try*/*catch*/*finally* block
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/tryf.gif
 
@@ -598,13 +592,12 @@ The default name of the *enum*/*interface*/*union* is determined similarly to cl
 
    Also in this sample: priv_, pub_
 
-.. _enum:
-.. _union:
-.. _inter:
-
-
-``enum``, ``inter``, ``union``
-##############################
+``enum``
+########
+``inter``
+#########
+``union``
+#########
 
 *enum*, *interface*, *union* definitions
 
@@ -667,7 +660,7 @@ values into the mixin at compile-time.
 
 *debug* block
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/debug.gif
 
@@ -677,7 +670,7 @@ Supports code-wrapping_.
 
 *version* block
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/version.gif
 
@@ -691,8 +684,6 @@ A plain template (not a template class/function) Like fun_, generates DDoc comme
 
    Also in this sample: al_
 
-
-.. _operators:
 
 Operators
 ^^^^^^^^^
@@ -715,37 +706,31 @@ Like fun_, generates DDoc comments for parameters (if any).
    Also in this sample: ret_
 
 
-.. _opAssign:
-
-``op=`` / ``opAssign``
-######################
+``opAssign``
+############
 
 
-*opAssign* (the *=* operator)
+*opAssign* (the *=* operator) [alias trigger: ``op=``]
 
 .. figure:: ./gif/opAssign.gif
 
    Also in this sample: spn_
 
 
-.. _opDollar:
+``opDollar``
+############
 
-``op$`` / ``opDollar``
-######################
-
-*opDollar* (the *$* operator)
+*opDollar* (the *$* operator) [alias trigger: ``op$``]
 
 .. figure:: ./gif/opDollar.gif
 
    Also in this sample: ret_
 
 
-.. _opSlice:
+``opSlice``
+###########
 
-``op[..]`` / ``opSlice``
-########################
-
-*opSlice* (operator to get a slice of a container)
+*opSlice* (operator to get a slice of a container) [alias trigger: ``op[..]``]
 
 Checks that the number of parameters is 0 or 2.
 
@@ -756,12 +741,10 @@ Checks that the number of parameters is 0 or 2.
    Also in this sample: ret_, spn_
 
 
-.. _opIndex:
+``opIndex``
+###########
 
-``op[]`` / ``opIndex``
-######################
-
-*opIndex* (operator to get an element of a container)
+*opIndex* (operator to get an element of a container) [alias trigger: ``op[]``]
 
 Checks that there is at least 1 parameter.
 
@@ -771,36 +754,30 @@ Checks that there is at least 1 parameter.
    Also in this sample: ret_
 
 
-.. _opSliceAssign:
+``opSliceAssign``
+#################
 
-``op[..]=`` / ``opSliceAssign``
-###############################
-
-*opSliceAssign* (operator to assign to a slice of a container)
+*opSliceAssign* (operator to assign to a slice of a container) [alias trigger: ``op[..]=``]
 
 Checks that the number of parameters is 1 or 3.
 
 .. figure:: ./gif/opSliceAssign.gif
 
 
-.. _opIndexAssign:
+``opIndexAssign``
+#################
 
-``op[]=`` / ``opIndexAssign``
-#############################
-
-*opIndexAssign* (operator to set an element of a container)
+*opIndexAssign* (operator to set an element of a container) [alias trigger: ``op[]=``]
 
 Checks that there are at least 2 parameters.
 
 .. figure:: ./gif/opIndexAssign.gif
 
 
-.. _opCall:
+``opCall``
+##########
 
-``op()`` / ``opCall``
-#####################
-
-*opCall* (function call operator)
+*opCall* (function call operator)  [alias trigger: ``op()``]
 
 Like fun_, generates DDoc comments for parameters.
 
@@ -864,7 +841,7 @@ Same as opB_, but for op assignment operators.
 
 *opApply* implementations usually contain a loop which passes individual elements to the
 *foreach*. ``opApply`` generates most of the code to pass the elements, which the user
-needs to wrap_ in a loop.
+needs to wrap in a loop.
 
 .. figure:: ./gif/opApply.gif
 
@@ -888,12 +865,13 @@ TODO comment
 .. figure:: ./gif/todo.gif
 
 
-.. _Par:
-.. _Ret:
+``Par``
+#######
+.. not a heading because GitHub is retarded
+.. (we can't have explicit anchors, or links with names different than anchors
+.. (case-insensitive) and there already is one implicit Ret)
 
-
-``Par``, ``Ret``
-################
+``Ret``
 
 DDoc *Params*, *Returns*
 
@@ -913,8 +891,11 @@ a *Params* section with 4 items.
    Document 2 parameters with ``Par2``
 
 
+.. not a heading because GitHub is retarded
+.. (we can't have explicit anchors, or links with names different than anchors
+.. (case-insensitive) and there already is one implicit Ret)
+
 ``Thr``
-#######
 
 DDoc *Throws*
 
@@ -933,7 +914,7 @@ DDoc *Example*
 
 Must be preceded with ``'/// '`` or ``'* '`` (i.e. single- or multi-line DDoc comments).
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/docEx.gif
 
@@ -983,10 +964,6 @@ scope_, spn_, supe_, with_
 
 .. figure:: ./gif/imp.gif
 
-.. _avar:
-.. _cvar:
-.. _ivar:
-
 
 ``module``
 ##########
@@ -1011,8 +988,12 @@ common license for D projects).
 
 
 
-``avar``, ``cvar``, ``ivar``
-############################
+``avar``
+########
+``cvar``
+########
+``ivar``
+########
 
 *auto* / *const* / *immutable* variable definition
 
@@ -1037,13 +1018,14 @@ common license for D projects).
    Also in this sample: avar_
 
 
-.. _pub:
-.. _priv:
-.. _prot:
-.. _pack:
-
-``pub``, ``priv``, ``prot``, ``pack``
-#####################################
+``pub``
+#######
+``priv``
+########
+``prot``
+########
+``pack``
+########
 
 *public* / *private* / *protected* / *package*  protection attributes
 
@@ -1098,7 +1080,7 @@ parent constructor call
 
 *scope* guard
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/scope.gif
 
@@ -1108,7 +1090,7 @@ Supports code-wrapping_.
 
 *with* block
 
-Supports code-wrapping_.
+Supports code wrapping_.
 
 .. figure:: ./gif/with.gif
 
