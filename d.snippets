@@ -455,6 +455,29 @@ foreach(${1:item}; ${2:/+2: range+/}) if(${3:/+3: condition+/})
 }
 endsnippet
 
+snippet fe "foreach (fe)"
+foreach(${1:/*elem*/}; ${2:/*range*/})
+	${VISUAL}${3:/*code*/}
+endsnippet
+
+snippet feb "foreach block (feb)"
+foreach(${1:/*elem*/}; ${2:/*range*/})
+{
+	${VISUAL}${3:/*code*/}
+}
+endsnippet
+
+snippet fei "foreach index (fei)"
+foreach(i, ${1:/*elem*/}; ${2:/*range*/})
+	${VISUAL}${3:/*code*/}
+endsnippet
+
+snippet feib "foreach index block (feib)"
+foreach(i, ${1:/*elem*/}; ${2:/*range*/})
+{
+	${VISUAL}${3:/*code*/}
+}
+
 # -------------------------
 # Contracts, asserts, tests
 # -------------------------
