@@ -490,6 +490,74 @@ breakLine(snip, linelength, len("assert("), " ")
 ${0}
 endsnippet
 
+snippet ae "assert =="
+assert(${1:actual} == ${2:expected}, "$1 != $2");
+endsnippet
+
+snippet ase "static assert =="
+static assert(${1:actual} == ${2:expected}, "$1 != $2");
+endsnippet
+
+snippet ane "assert !="
+assert(${1:actual} != ${2:expected}, "$1 == $2");
+endsnippet
+
+snippet asne "static assert !="
+static assert(${1:actual} != ${2:expected}, "$1 == $2");
+endsnippet
+
+snippet ann "assert !is null"
+assert(${1:ref} !is null, "$1 is null");
+endsnippet
+
+snippet asnn "static assert !is null"
+static assert(${1:ref} !is null, "$1 is null");
+endsnippet
+
+snippet asis "static assert is "
+static assert(${1:ref} is ${2:type}, "$1 !is $2");
+endsnippet
+
+snippet alt "assert <"
+assert(${1:actual} < ${2:expected}, "$1 >= $2");
+endsnippet
+
+snippet aslt "static assert <"
+static assert(${1:actual} < ${2:expected}, "$1 >= $2");
+endsnippet
+
+snippet ale "assert <="
+assert(${1:actual} <= ${2:expected}, "$1 > $2");
+endsnippet
+
+snippet asle "static assert <="
+static assert(${1:actual} <= ${2:expected}, "$1 > $2");
+endsnippet
+
+snippet agt "assert >"
+assert(${1:actual} > ${2:expected}, "$1 <= $2");
+endsnippet
+
+snippet asgt "static assert >"
+static assert(${1:actual} > ${2:expected}, "$1 <= $2");
+endsnippet
+
+snippet age "assert >="
+assert(${1:actual} >= ${2:expected}, "$1 < $2");
+endsnippet
+
+snippet asge "static assert >="
+static assert(${1:actual} >= ${2:expected}, "$1 < $2");
+endsnippet
+
+snippet af "assert false"
+assert(false, "${1:msg}");
+endsnippet
+
+snippet asf "static assert(false)"
+static assert(false, "${1:msg}");
+endsnippet
+
 snippet utest "unittest (utest)" b
 unittest
 {
