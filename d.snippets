@@ -1,9 +1,9 @@
-# clear old D snippets. 
+# clear old D snippets.
 # (TODO should be removed if we request a merge into the default repo)
 clearsnippets
 priority -50
 
-global !p 
+global !p
 
 # Functions useful for all snippets
 
@@ -25,7 +25,7 @@ def breakLine(snip, linelength, extraindent = 0, default = ""):
 
     :param snip:        The UltiSnips snippet object.
     :param linelength:  Length of the line.
-    :param extraindent: Add this many spaces of extra indentation after the line break 
+    :param extraindent: Add this many spaces of extra indentation after the line break
                         (for alignment of lines).
     :param default:     If the line is not too long, insert this string instead of a
                         line break.
@@ -44,7 +44,7 @@ def alignSpaces(t, current, *other):
     above/below it that should be aligned equally.
     Useful e.g. to align parameter names in DDoc of a function.
 
-    :param t: Tabstops of the snippet 
+    :param t: Tabstops of the snippet
     :param current: Index of the current item that's being aligned in t
     :param other: Indices of all other items aligned with the current element
     """
@@ -56,7 +56,7 @@ def paramNames(paramStr):
     """
     Get a list of parameter names for a function.
 
-    :param paramStr: Parameter list of a function as a single string. E.g. for 
+    :param paramStr: Parameter list of a function as a single string. E.g. for
                      void doStuff(int p1, string p2), this would be "int p1, string p2"
     """
     import re
@@ -86,7 +86,7 @@ def paramsDoc(snip, paramStr, docStr):
     Generate the 'Params:' DDoc section with all parameter names.
 
     :param snip:     The UltiSnips snippet object.
-    :param paramStr: Parameter list of a function as a single string. E.g. for 
+    :param paramStr: Parameter list of a function as a single string. E.g. for
                      void doStuff(int p1, string p2), this would be "int p1, string p2"
     :param docStr:   A reference documentation string to determine documentation style
                      ('///' vs '/**/')
@@ -103,11 +103,11 @@ def paramsDoc(snip, paramStr, docStr):
 
 def funcDoc(snip, description, params, defParams):
     """
-    Generate a DDoc header for a function (except the description at the beginning of 
+    Generate a DDoc header for a function (except the description at the beginning of
     the header, which is written by the user as a tabstop)
 
     :param snip:        The UltiSnips snippet object.
-    :param params:      Parameter list of the function as a single string. E.g. for 
+    :param params:      Parameter list of the function as a single string. E.g. for
                         void doStuff(int p1, string p2), this would be "int p1, string p2".
     :param defParams:   Default parameter list of the function as defined by the
                         snippet (as a single string),
@@ -123,7 +123,7 @@ def funcDoc(snip, description, params, defParams):
 
 def typeName(basename):
     """
-    Get a name for a type (e.g. class or struct) defined by a snippet based on the 
+    Get a name for a type (e.g. class or struct) defined by a snippet based on the
     base name of the file.
 
     :param basename: The base name of the source file. E.g. 'matrix' for 'matrix.d'.
@@ -238,7 +238,7 @@ endsnippet
 # Future TODO: @safe should have completion for @system and @trusted.
 #              const should have completion for immutable and inout.
 
-# @nogc is $0 so when used in a function definition snippet we can move to the next 
+# @nogc is $0 so when used in a function definition snippet we can move to the next
 # tabstop immediately
 snippet spn "@safe pure nothrow const @nogc (spn)"
 ${1:@safe }${2:pure }${3:nothrow }${4:const }${0:@nogc }
@@ -512,7 +512,7 @@ endsnippet
 # future TODO: if non-void, generate `Returns:`. If `throw` found in body, generate
 #              `Throws:`
 snippet fun "function definition (fun)"
-${5:/+5: /// Description+/}`!p 
+${5:/+5: /// Description+/}`!p
 funcDoc(snip, t[5], t[3], "")
 `
 ${1:void} ${2:/+2: name+/}(${3}) ${4:@safe pure nothrow @nogc}
@@ -522,7 +522,7 @@ ${1:void} ${2:/+2: name+/}(${3}) ${4:@safe pure nothrow @nogc}
 endsnippet
 
 snippet this "constructor (this)" w
-${3:/+3: /// Description+/}`!p 
+${3:/+3: /// Description+/}`!p
 funcDoc(snip, t[3], t[1], "")
 `
 this(${1})${2: @safe pure nothrow @nogc}
@@ -662,7 +662,7 @@ endsnippet
 
 snippet exc "exception definition (exc)" b
 ${3:/+3: documentation+/}
-class ${1:/+1: name+/}Exception : ${2:/+1: parent+/}Exception 
+class ${1:/+1: name+/}Exception : ${2:/+1: parent+/}Exception
 {
 	this(string msg, string file = __FILE__, int line = __LINE__)
 		@safe pure nothrow
@@ -704,7 +704,7 @@ debug
 endsnippet
 
 snippet template "template (template)" b
-${4:/+4: /// Description+/}`!p 
+${4:/+4: /// Description+/}`!p
 funcDoc(snip, t[4], t[3], "/+3: parameters+/")
 `
 ${1:mixin }template ${2:/+2: name+/}(${3:/+3: parameters+/})
@@ -719,7 +719,7 @@ endsnippet
 # ---------
 
 snippet opDis "opDispatch (opDis)"
-${3:/+3: /// Description+/}`!p 
+${3:/+3: /// Description+/}`!p
 funcDoc(snip, t[3], t[2], "/+2: parameters+/")
 `
 ${1:auto} opDispatch(string s)(${2})
@@ -775,7 +775,7 @@ ${1:void} opIndexAssign(${2:/+type+/} rhs, ${3:size_t index})${4: @safe pure not
 endsnippet
 
 snippet `op(\(\)|Call)` "opCall (op())" r
-${4:/+4: /// Description+/}`!p 
+${4:/+4: /// Description+/}`!p
 funcDoc(snip, t[4], t[2], "/+2: parameters+/")
 `
 ${1:/+1: return type+/} opCall(${2:/+2: parameters+/})${3: @safe pure nothrow }
@@ -802,7 +802,7 @@ ${2:void} op`!p snip.rv = opType(match)`(string op)(${3:/+2: type+/} rhs)${4: @s
 	{
 		${0}
 	}`!p
-# generate static if blocks for all operators except the first 
+# generate static if blocks for all operators except the first
 # (the first is generated above)
 snip.shift(1)
 ops = opList(t, match)[1:]
@@ -849,7 +849,7 @@ endsnippet
 # -----------------
 #
 # This is more complicated than it should be since we can't have snippets that generate
-# more tabstops based on the trigger. So we have e.g. separate snippets for 
+# more tabstops based on the trigger. So we have e.g. separate snippets for
 # 1,2,3,4 and 5 params.
 #
 # The Par snippets keep the params aligned for readability, and support both '///' and
@@ -946,16 +946,16 @@ snippet gpl "GPL (gpl)" b
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 // Copyright (C) ${0:Author}, `!v strftime("%Y")`
 endsnippet
 
