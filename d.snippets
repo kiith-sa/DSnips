@@ -231,6 +231,14 @@ alias ${1:/+1: alias+/} = ${2:/+2: original name+/};
 ${0}
 endsnippet
 
+# A simple shortcut for 'static ' to be combined with other snippets to get e.g.
+# 'static assert', 'static if', a static function, etc. While this goes into the realm
+# of autocompletion, it is useful as if we press st<Tab> in D this is almost always
+# what we want.
+snippet st "static (st)" b
+static ${0}
+endsnippet
+
 snippet new "new (new)"
 new ${1}(${0})
 endsnippet
