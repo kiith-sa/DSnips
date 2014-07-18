@@ -456,6 +456,14 @@ foreach(${1:item}; ${2:/+2: range+/})
 }
 endsnippet
 
+# saves exactly 2 keystrokes compared to ``fore`` but is frequent enough to be helpful.
+snippet forei "foreach with an index (forei)"
+foreach(i, ${1:item}; ${2:/+2: range+/})
+{
+	${3:${VISUAL}}${0}
+}
+endsnippet
+
 snippet forif "foreach if (forif)" b
 foreach(${1:item}; ${2:/+2: range+/}) if(${3:/+3: condition+/})
 {
