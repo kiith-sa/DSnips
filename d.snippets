@@ -5,6 +5,17 @@ priority -50
 
 global !p
 
+# Global variables
+
+# negateOp[op] gives a negated version of operator op
+negateOp = {"=="  : "!=",
+            "!="  : "==",
+            "!is" : "is",
+            "is"  : "!is",
+            "<"   : ">=",
+            "<="  : ">",
+            ">"   : "<=",
+            ">="  : "<"}
 # Functions useful for all snippets
 
 def complete(t, opts):
@@ -503,6 +514,25 @@ assert(${1:false},`!p
 linelength = len(snip.indent + "assert(, \"\");" + t[1] + t[2])
 breakLine(snip, linelength, len("assert("), " ")
 `"${2:TODO}");
+${0}
+endsnippet
+
+# Assert with operator;
+# e.g. as== assert($1 == $2, "$1 != $2);
+# Convenient for e.g. quick unittest asserts.
+#
+# Based on operator asserts by https://github.com/simendsjo
+#
+# If the operator is "is" or "!is", $2 is "null" instead of "expected" as
+# "null" is the most common case. The snippet is admittedly hard to read but gets 
+# simpler if you put every python block on a separte line.
+# (which we can't do because of how UltiSnips inlines the generated text)
+snippet `as(==|!=|!is|is|<|<=|>|>=)` "asOp (assert operator, e.g. as==, as<=)" r
+assert(${1:actual} `!p snip.rv = match.group(1); ` ${2:`!p snip.rv = "null" if "is" in match.group(1) else "expected"`},`!p
+linelength = len(snip.indent + "assert(  , \"  \");" + 2 * (t[1] + t[2])
+                 + match.group(1) + negateOp[match.group(1)])
+breakLine(snip, linelength, len("assert("), " ")
+`"$1 `!p snip.rv = negateOp[match.group(1)];` $2");
 ${0}
 endsnippet
 
