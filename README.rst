@@ -1,4 +1,11 @@
 .. TODO
+.. needed GIFs:
+.. * as$OP (e.g. as==, asis and such) (and a reference section!)
+.. * if2 (the static if GIF - use ``st`` with ``if)
+..   Maybe same for static assert, etc.
+.. * forei (and a reference section!)
+.. * st (and a reference section!)
+.. 
 .. would-be-nice new GIFs:
 .. * enf (removed default parameter to exception)
 .. * fun (use spn)
@@ -14,7 +21,7 @@ DSnips - better UltiSnips snippets for D
 
 DSnips is a collection of `UltiSnips <https://github.com/SirVer/ultisnips>`_ snippets
 for the D programming language. UltiSnips is a snippets plugin for `Vim
-<http://vim.org>`_
+<http://vim.org>`_.
 
 A few examples of what snippets can do:
 
