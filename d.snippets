@@ -640,7 +640,7 @@ try
 {
 	${1:${VISUAL}}${2}
 }
-catch(${3:/+3: name+/}Exception e)
+catch(${3}Exception e)
 {
 	${4:/+4: handle exception+/}
 }
@@ -652,7 +652,7 @@ try
 {
 	${1:${VISUAL}}${2}
 }
-catch(${3:/+3: name+/}Exception e)
+catch(${3}Exception e)
 {
 	${4:/+4: handle exception+/}
 }
@@ -663,7 +663,7 @@ finally
 endsnippet
 
 snippet catch "catch (catch)" b
-catch(${1:/+1: name+/}Exception e)
+catch(${1}Exception e)
 {
 	${0:/+2: handle the exception+/}
 }
@@ -715,7 +715,7 @@ endsnippet
 
 snippet exc "exception definition (exc)" b
 ${3:/+3: documentation+/}
-class ${1:/+1: name+/}Exception : ${2:/+1: parent+/}Exception
+class ${1:/+1: name+/}Exception : ${2}Exception
 {
 	this(string msg, string file = __FILE__, int line = __LINE__)
 		@safe pure nothrow
