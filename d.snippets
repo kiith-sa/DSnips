@@ -211,7 +211,12 @@ def opList(t, match):
             if opstring != "":
                 return ["no op" + optype + " operator starts with " + opstring]
     return result
-
+def packageName(fullPath):
+    parts = fullPath.split("/")[:-1]
+    # DUB
+    if "source" in parts:
+        return '.'.join(parts[parts.index("source") + 1: ])
+    return parts[-1] if len(parts) else "/+package name+/"
 endglobal
 
 # Future TODO: more snippets taking line width to account.
