@@ -227,6 +227,9 @@ endglobal
 # Various
 # -------
 
+# If the user has a DUB-style file hierarchy with 'source/package/subpackage/file.d',
+# this will correctly set the full package name.
+# Otherwise it will guess that parent directory name is the package name.
 snippet module "New module (module)" b
 ${1://          Copyright ${2:/+1: Author+/} `!v strftime("%Y")`.
 // Distributed under the Boost Software License, Version 1.0.
