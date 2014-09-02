@@ -233,7 +233,7 @@ ${1://          Copyright ${2:/+1: Author+/} `!v strftime("%Y")`.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)}
 
-module ${3:/+2: package name+/}.`!v Filename('$1', 'name')`;
+module ${3:`!p snip.rv = packageName(vim.eval("split(expand('%:p'))")[0])`}.`!v vim_snippets#Filename('$1', 'name')`;
 
 
 ${0}
