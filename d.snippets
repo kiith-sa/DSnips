@@ -349,6 +349,13 @@ writeln(${1:${VISUAL}});
 ${0}
 endsnippet
 
+# Writeln debugging: type a comma-separated list of values to create a writeln()
+# that will print them along their names.
+snippet wrdbg "writeln debugging (wrdbg)"
+writeln("${1:${VISUAL}} = ", `!p snip.rv = ', \", \",'.join(t[1].split(','))`);
+${0}
+endsnippet
+
 snippet wrf "writefln (wrf)"
 writefln("${1:/+1: format string+/}", ${2:${VISUAL}});
 ${0}
