@@ -534,7 +534,7 @@ endsnippet
 # "null" is the most common case. The snippet is admittedly hard to read but gets 
 # simpler if you put every python block on a separte line.
 # (which we can't do because of how UltiSnips inlines the generated text)
-snippet `as(==|!=|!is|is|<|<=|>|>=)` "asOp (assert operator, e.g. as==, as<=)" r
+snippet `as(==|!=|!is|is|(?:<|>)=?)` "asOp (assert operator, e.g. as==, as<=)" r
 assert(${1:actual} `!p snip.rv = match.group(1); ` ${2:`!p snip.rv = "null" if "is" in match.group(1) else "expected"`},`!p
 linelength = len(snip.indent + "assert(  , \"  \");" + 2 * (t[1] + t[2])
                  + match.group(1) + negateOp[match.group(1)])
