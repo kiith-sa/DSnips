@@ -19,6 +19,12 @@
 DSnips - better UltiSnips snippets for D
 ========================================
 
+.. note::
+
+   Changes in UltiSnips master broke compatibility with DSnips recently (August 2014).
+   Update DSnips (re-download `d.snippets`) to fix this.
+
+
 DSnips is a collection of `UltiSnips <https://github.com/SirVer/ultisnips>`_ snippets
 for the D programming language. UltiSnips is a snippets plugin for `Vim
 <http://vim.org>`_.
