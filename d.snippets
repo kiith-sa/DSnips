@@ -766,6 +766,11 @@ ${1:mixin }template ${2:/+2: name+/}(${3:/+3: parameters+/})
 }
 endsnippet
 
+# Added pragma() with autocomplete
+snippet pragma "pragma (pragma)" b
+pragma(${1:msg}`!p snip.rv = complete(t[1], ["msg", "lib", "startaddress", "mangle"])`, ${2});
+${0}
+endsnippet
 
 # ---------
 # Operators
