@@ -319,7 +319,7 @@ endsnippet
 
 # Future TODO: exit/success/failure completion
 snippet scope "scope (scope)" b
-scope(${1:exit})
+scope(${1:exit}`!p snip.rv = complete(t[1], ["exit", "success", "failure"])`)
 {
 	${2:${VISUAL}}${0}
 }
